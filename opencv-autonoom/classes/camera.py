@@ -8,7 +8,7 @@ def draw_lines(img, lines):
     try:
         for line in lines:
             coords = line[0]
-            cv2.line(img, (coords[0], coords[1]), (coords[2], coords[3]), [255, 255, 255], 3)
+            cv2.line(img, (coords[0], coords[1]), (coords[2], coords[3]), [255, 0, 255], 3)
     except:
         pass
 
@@ -24,10 +24,13 @@ def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_img = cv2.Canny(processed_img, threshold1=200, threshold2=300)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
-    vertices = np.array([[10, 500], [10, 300], [300, 200], [500, 200], [800, 300], [800, 500]], np.int32)
+    vertices = np.array([[0, 400], [0, 200], [300, 200], [500, 200], [800, 200], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
     lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 50, 15)
+    print 'dit is lijn '
+    print\
+        lines
     draw_lines(processed_img, lines)
     return processed_img
 
@@ -45,7 +48,7 @@ def main():
             bytes = bytes[b + 2:]
             frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8),cv2.IMREAD_COLOR)
             new_screen = process_img(frame)
-            print('Loop took {} seconds'.format(time.time()-last_time))
+           # print('Loop took {} fps' .format(1 / (time.time()-last_time)))
             last_time = time.time()
             cv2.imshow('window', new_screen)
             # cv2.imshow('wiqndow2', cap)
