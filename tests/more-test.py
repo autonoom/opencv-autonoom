@@ -13,10 +13,8 @@ def draw_lines(img, lines):
             for line in lines:
                 if lijn1 is None:
                     coords = line[0]
-                    print coords[0]
-                elif lijn2 is None and (coords[0] < lijn1[0] -100 or coords[0] > lijn1[0] + 100):
+                elif lijn2 is None or (coords[0] < lijn1[0] -100 or coords[0] > lijn1[0] + 100):
                     coords = line[0]
-                    print coords[0]
                 if lijn1 is None:
                     lijn1 = coords
                 elif lijn2 is None and lijn1 is not None:
@@ -24,7 +22,6 @@ def draw_lines(img, lines):
                 cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
                 if lijn2 is not None:
                     cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
-                print coords
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
         cv2.line(img,(xtop, 0), (xbot, 400),[255, 140, 0], 3)
@@ -39,7 +36,7 @@ def draw_lines(img, lines):
 
 def draw_middle(img):
     y, x, z = img.shape
-    cv2.line(img, ((x / 2),y),((x/2), y-200),[85, 26, 139],3)
+    cv2.line(img, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 3)
 
 
 
@@ -58,11 +55,12 @@ def process_img(original_image):
 
     lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 20, 5)
     draw_lines(original_image, lines)
+    draw_middle(img)
     return original_image
 
 
 img = cv2.imread("weg.png")
-draw_middle(img)
+
 new_screen = process_img(img)
 cv2.imshow('window', new_screen)
 if cv2.waitKey(0) & 0xFF == ord('q'):
