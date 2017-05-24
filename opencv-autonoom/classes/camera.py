@@ -1,16 +1,52 @@
 import numpy as np
 import cv2
 import time
+import math
 import urllib
 
 
 def draw_lines(img, lines):
+    lijn1 = None
+    lijn2 = None
+    # print lines
     try:
-        for line in lines:
-            coords = line[0]
-            cv2.line(img, (coords[0], coords[1]), (coords[2], coords[3]), [255, 0, 255], 3)
-    except:
+        if lijn2 is None:
+            for line in lines:
+                if lijn1 is None:
+                    coords = line[0]
+                elif lijn2 is None or (coords[0] < lijn1[0] -100 or coords[0] > lijn1[0] + 100):
+                    coords = line[0]
+                if lijn1 is None:
+                    lijn1 = coords
+                elif lijn2 is None and lijn1 is not None:
+                    lijn2 = coords
+                cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
+                if lijn2 is not None:
+                    cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
+        xtop = (lijn2[0] + lijn1[2]) / 2
+        xbot = (lijn2[2] + lijn1[0]) / 2
+        cv2.line(img,(xtop, 0), (xbot, 400),[255, 140, 0], 3)
+        print xtop
+        print xbot
+
+        calculate_degree(lijn1)
+        calculate_degree(lijn2)
+    except Exception:
         pass
+
+
+def draw_middle(img):
+    y, x, z = img.shape
+    cv2.line(img, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 3)
+
+
+
+def calculate_degree(point):                     # http://wikicode.wikidot.com/get-angle-of-line-between-two-points
+    x_diff = point[2] - point[0]
+    y_diff = point[3] - point[1]
+    angle = math.degrees(math.atan2(y_diff, x_diff))
+    angle = angle * -1
+    print round(angle % 360)
 
 
 def roi(img, vertices):
@@ -31,7 +67,7 @@ def process_img(original_image):
     print 'dit is lijn '
     print\
         lines
-    draw_lines(processed_img, lines)
+    draw_lines(original_image, lines)
     return processed_img
 
 
