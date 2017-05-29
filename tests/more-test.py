@@ -3,25 +3,42 @@ import numpy as np
 import time
 import math
 
+centerPic = 350
 
 def draw_lines(img, lines):
     lijn1 = None
     lijn2 = None
-    # print lines
+    i = 0
     try:
-        if lijn2 is None:
-            for line in lines:
-                if lijn1 is None:
-                    coords = line[0]
-                elif lijn2 is None or (coords[0] < lijn1[0] -100 or coords[0] > lijn1[0] + 100):
-                    coords = line[0]
-                if lijn1 is None:
-                    lijn1 = coords
-                elif lijn2 is None and lijn1 is not None:
-                    lijn2 = coords
-                cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
-                if lijn2 is not None:
-                    cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
+        while lijn1 is None and lijn2 is None:
+            #eerste lijn en die moet onder de 350 pixels met de x1 en x2
+            #eerste lijn niet twee keer vullen
+            if lijn1 is None:
+                a = i
+                if lines[i][0][0] < centerPic and lines[i][0][2] < centerPic:
+                    lijn1 = lines[i][0]
+                    print "dit is lijn1"
+                    print lijn1
+                    a += 1
+
+            #tweede lijn moet boven de 350 pixels met beide x1 en x2
+            #tweede lijn niet opnieuw vullen
+            if lijn2 is None:
+                if lines[a][0][0] >= centerPic and lines[a][0][2] >= centerPic:
+                    lijn2 = lines[a][0]
+                    print "dit is lijn2"
+                    print lijn2
+            i += 1
+            #elif lijn2 is None or (coords[0] < lijn1[0] -100 or coords[0] > lijn1[0] + 100):
+            #    coords = line[0]
+            #if lijn1 is None:
+            #    lijn1 = coords
+            #elif lijn2 is None and lijn1 is not None:
+            #    lijn2 = coords
+
+            cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
+            if lijn2 is not None:
+                cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
         cv2.line(img,(xtop, 0), (xbot, 400),[255, 140, 0], 3)
