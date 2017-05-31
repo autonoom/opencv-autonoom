@@ -12,7 +12,7 @@ def draw_lines(img, lines):
 
     centerpic = 300
     # print lines
-    draw_middle(img)
+
     try:
         while lijn1 is None and lijn2 is None:
             # eerste lijn en die moet onder de 350 pixels met de x1 en x2
@@ -22,7 +22,10 @@ def draw_lines(img, lines):
                 if lines[i][0][0] < centerpic and lines[i][0][2] < centerpic:
                     lijn1 = lines[i][0]
                     a += 1
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
                     # print "dit is lijn1"
                     # print lijn1
 
@@ -36,6 +39,7 @@ def draw_lines(img, lines):
                     # print lijn2
         i += 1
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
+<<<<<<< Updated upstream
     # if lijn2 is not None:
         cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         xtop = (lijn2[0] + lijn1[2]) / 2
@@ -45,17 +49,34 @@ def draw_lines(img, lines):
         middle = (xbot+xtop)/2
         print middle
 
+=======
+        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
+        xtop = (lijn2[0] + lijn1[2]) / 2
+        xbot = (lijn2[2] + lijn1[0]) / 2
+        gem = (xtop + xbot) / 2
+        draw_middle(img, gem)
+        cv2.line(img,(gem, 0), (gem, 400),[255, 140, 0], 3)
 
 
-        calculate_degree(lijn1)
-        calculate_degree(lijn2)
+        # print xtop
+        # print xbot
+>>>>>>> Stashed changes
+
+
+       # calculate_degree(lijn1)
+       # calculate_degree(lijn2)
     except Exception:
         pass
 
 
-def draw_middle(img):
+def draw_middle(img, gem):
     y, x, z = img.shape
-    cv2.line(img, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 3)
+    dif = gem - (x / 2)
+
+
+    print dif
+    cv2.line(img, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 1)
+
 
 
 def calculate_degree(point):                     # http://wikicode.wikidot.com/get-angle-of-line-between-two-points
