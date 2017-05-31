@@ -10,7 +10,7 @@ def draw_lines(img, lines):
     lijn2 = None
     i = 0
 
-    centerpic = 400
+    centerpic = 300
     # print lines
     draw_middle(img)
     try:
@@ -21,6 +21,7 @@ def draw_lines(img, lines):
                 a = i
                 if lines[i][0][0] < centerpic and lines[i][0][2] < centerpic:
                     lijn1 = lines[i][0]
+                    a += 1
 
                     # print "dit is lijn1"
                     # print lijn1
@@ -35,13 +36,15 @@ def draw_lines(img, lines):
                     # print lijn2
         i += 1
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
-        if lijn2 is not None:
-            cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
+    # if lijn2 is not None:
+        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
         cv2.line(img,(xtop, 0), (xbot, 400),[255, 140, 0], 3)
-        # print xtop
-        # print xbot
+        print 'midden'
+        middle = (xbot+xtop)/2
+        print middle
+
 
 
         calculate_degree(lijn1)
