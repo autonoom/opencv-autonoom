@@ -4,12 +4,14 @@ import time
 import math
 import urllib
 
+lijn1 = None
+lijn2 = None
 
 def draw_lines(img, lines):
-    lijn1 = None
-    lijn2 = None
-    i = 0
+    
 
+    i = 0
+    print lines
     centerpic = 300
     # print lines
 
@@ -22,14 +24,8 @@ def draw_lines(img, lines):
                 if lines[i][0][0] < centerpic and lines[i][0][2] < centerpic:
                     lijn1 = lines[i][0]
                     a += 1
-<<<<<<< Updated upstream
-
-=======
->>>>>>> Stashed changes
                     # print "dit is lijn1"
                     # print lijn1
-
-
             # tweede lijn moet boven de 400 pixels met beide x1 en x2
             # tweede lijn niet opnieuw vullen
             if lijn2 is None:
@@ -39,7 +35,7 @@ def draw_lines(img, lines):
                     # print lijn2
         i += 1
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 3)
-<<<<<<< Updated upstream
+
     # if lijn2 is not None:
         cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         xtop = (lijn2[0] + lijn1[2]) / 2
@@ -49,7 +45,7 @@ def draw_lines(img, lines):
         middle = (xbot+xtop)/2
         print middle
 
-=======
+
         cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
@@ -60,7 +56,7 @@ def draw_lines(img, lines):
 
         # print xtop
         # print xbot
->>>>>>> Stashed changes
+
 
 
        # calculate_degree(lijn1)
