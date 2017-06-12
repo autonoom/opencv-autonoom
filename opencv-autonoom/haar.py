@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 import time
 import urllib
-
+import socket
 
 #face_cascade = cv2.CascadeClassifier('face.xml')
 #eye_cascade = cv2.CascadeClassifier('eye.xml')
@@ -54,18 +54,37 @@ def detect(image):
             if 1.0 / 8 * (height - 30) < maxLoc[1] < 4.0 / 8 * (height - 30):
                 cv2.putText(image, 'Red', (x_pos + 5, y_pos - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 red_light = True
+                TCP_IP = '192.168.42.1'
+                TCP_PORT = 5005
+                BUFFER_SIZE = 1024
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((TCP_IP, TCP_PORT))
+                s.send('stop')
                 print "red"
 
             # Green light
             elif 5.5 / 8 * (height - 30) < maxLoc[1] < height - 30:
                 cv2.putText(image, 'Green', (x_pos + 5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0),
                             2)
+                TCP_IP = '192.168.42.1'
+                TCP_PORT = 5005
+                BUFFER_SIZE = 1024
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((TCP_IP, TCP_PORT))
+                s.send('start')
                 green_light = True
                 print "green"
+
             #yellow light
             elif 4.0/8*(height-30) < maxLoc[1] < 5.5/8*(height-30):
                 cv2.putText(image, 'Yellow', (x_pos+5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
                 yellow_light = True
+                TCP_IP = '192.168.42.1'
+                TCP_PORT = 5005
+                BUFFER_SIZE = 1024
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((TCP_IP, TCP_PORT))
+                s.send('stop')
                 print "orange"
     return image
 

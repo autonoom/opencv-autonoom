@@ -60,7 +60,7 @@ def draw_middle(img, gem):
     BUFFER_SIZE = 1024
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     s.connect((TCP_IP, TCP_PORT))
-    s.send('test')
+    s.send(dif)
     print dif
     cv2.line(img, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 1)
 
