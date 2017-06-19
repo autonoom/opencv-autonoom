@@ -7,7 +7,7 @@ import socket
 detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
 
 
-def detect(image):
+def detect_trafficlight(image):
     red_light = False
     green_light = False
     yellow_light = False
@@ -214,7 +214,7 @@ def main():
             jpg = bytes[a:b + 2]
             bytes = bytes[b + 2:]
             frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-            new2_screen = detect(frame)
+            new2_screen = detect_trafficlight(frame)
             new_screen = process_img(frame)                                   # stuurt frame op naar process_img
             cv2.imshow('window', new_screen)                                        # laat video zien
             cv2.imshow('window2', new2_screen)
