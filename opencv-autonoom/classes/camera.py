@@ -6,8 +6,15 @@ import socket
 
 detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
 
+TCP_IP = '192.168.42.1'
+TCP_PORT = 5005
+BUFFER_SIZE = 1024
 
-def detect_trafficlight(image):
+s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+s.connect((TCP_IP, TCP_PORT))
+
+def detect(image):
+
     red_light = False
     green_light = False
     yellow_light = False
@@ -46,11 +53,6 @@ def detect_trafficlight(image):
             if 1.0 / 8 * (height - 30) < maxLoc[1] < 4.0 / 8 * (height - 30):
                 cv2.putText(image, 'Red', (x_pos + 5, y_pos - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
                 red_light = True
-                TCP_IP = '192.168.42.1'
-                TCP_PORT = 5005
-                BUFFER_SIZE = 1024
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                s.connect((TCP_IP, TCP_PORT))
                 s.send('stop')
                 print "red"
 
@@ -58,12 +60,7 @@ def detect_trafficlight(image):
             elif 5.5 / 8 * (height - 30) < maxLoc[1] < height - 30:
                 cv2.putText(image, 'Green', (x_pos + 5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
                 green_light = True
-                # TCP_IP = '192.168.42.1'
-                # TCP_PORT = 5005
-                # BUFFER_SIZE = 1024
-                # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-                # s.connect((TCP_IP, TCP_PORT))
-                # s.send('start')
+                s.send('start')
                 print "green"
 
             #yellow light
