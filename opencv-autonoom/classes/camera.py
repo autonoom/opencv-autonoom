@@ -4,6 +4,81 @@ import math
 import urllib
 import socket
 
+detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
+
+
+def detect(image):
+    red_light = False
+    green_light = False
+    yellow_light = False
+    # y camera coordinate of the target point 'P'
+    v = 0
+
+    # minimum value to proceed traffic light state validation
+    threshold = 150
+
+    gray_image = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
+
+    # detection
+    cascade_obj = detectMultiScale.detectMultiScale(
+        gray_image,
+        scaleFactor=1.1,
+        minNeighbors=5,
+        minSize=(30, 30)
+    )
+
+    # draw a rectangle around the objects
+    for (x_pos, y_pos, width, height) in cascade_obj:
+        cv2.rectangle(image, (x_pos + 5, y_pos + 5), (x_pos + width - 5, y_pos + height - 5), (255, 255, 255), 2)
+        v = y_pos + height - 5
+
+        # traffic lights
+
+        roi = gray_image[y_pos + 10:y_pos + height - 10, x_pos + 10:x_pos + width - 10]
+        mask = cv2.GaussianBlur(roi, (25, 25), 0)
+        (minVal, maxVal, minLoc, maxLoc) = cv2.minMaxLoc(mask)
+
+        # check if light is on
+        if maxVal - minVal > threshold:
+            cv2.circle(roi, maxLoc, 5, (255, 0, 0), 2)
+
+            # Red light
+            if 1.0 / 8 * (height - 30) < maxLoc[1] < 4.0 / 8 * (height - 30):
+                cv2.putText(image, 'Red', (x_pos + 5, y_pos - 5), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 0, 255), 2)
+                red_light = True
+                TCP_IP = '192.168.42.1'
+                TCP_PORT = 5005
+                BUFFER_SIZE = 1024
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s.connect((TCP_IP, TCP_PORT))
+                s.send('stop')
+                print "red"
+
+            # Green light
+            elif 5.5 / 8 * (height - 30) < maxLoc[1] < height - 30:
+                cv2.putText(image, 'Green', (x_pos + 5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 0), 2)
+                green_light = True
+                # TCP_IP = '192.168.42.1'
+                # TCP_PORT = 5005
+                # BUFFER_SIZE = 1024
+                # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                # s.connect((TCP_IP, TCP_PORT))
+                # s.send('start')
+                print "green"
+
+            #yellow light
+            elif 4.0/8*(height-30) < maxLoc[1] < 5.5/8*(height-30):
+                cv2.putText(image, 'Orange', (x_pos+5, y_pos - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, (0, 255, 255), 2)
+                yellow_light = True
+                # TCP_IP = '192.168.42.1'
+                # TCP_PORT = 5005
+                # BUFFER_SIZE = 1024
+                # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                # s.connect((TCP_IP, TCP_PORT))
+                # s.send('stop')
+                print "orange"
+    return image
+
 
 def draw_lines(img, lines):
     lijn1 = None
@@ -139,10 +214,12 @@ def main():
             jpg = bytes[a:b + 2]
             bytes = bytes[b + 2:]
             frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
+            new2_screen = detect(frame)
             new_screen = process_img(frame)                                   # stuurt frame op naar process_img
             cv2.imshow('window', new_screen)                                        # laat video zien
+            cv2.imshow('window2', new2_screen)
             # cv2.imshow('wiqndow2', cap)
-            cv2.imshow('window2', frame)
+            cv2.imshow('window3', frame)
             if cv2.waitKey(25) & 0xFF == ord('q'):                         # wanneer 'q' is ingedrukt stop programma
                 cv2.destroyAllWindows()
                 break
