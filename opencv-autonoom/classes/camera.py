@@ -193,7 +193,7 @@ def process_img(original_image):
     vertices = np.array([[0, 400], [50, 200], [150, 150], [500, 150], [800, 400], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 25)
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 20)
     draw_lines(original_image, lines)
 
     # cv2.imshow('sjaak', original_image)         # stuurt de foto en de coordinaten van de lijnen op
