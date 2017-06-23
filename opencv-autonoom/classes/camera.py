@@ -193,7 +193,7 @@ def calculate_avg(diference):
             data2 = float(data2) / 5
             print "Avg data = " + str(data2)
             data2 *= 2
-            s.send(str(data2))
+            #s.send(str(data2))
             data = 0
             counter = 0
             data2 = 0
@@ -202,7 +202,7 @@ def calculate_avg(diference):
     else:
         print 'dd'
     return False
-# def bird_eye (image):
+# def bird_eye(image):
 #     # y, x, ch = image.shape
 #     # print x
 #     # print y
@@ -228,7 +228,9 @@ def process_img(original_image):
     vertices = np.array([[0, 400], [50, 200], [150, 150], [500, 150], [800, 400], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 20)
+    #linelenght
+    #gaps
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 50)
     draw_lines(original_image, lines)
 
     # cv2.imshow('sjaak', original_image)         # stuurt de foto en de coordinaten van de lijnen op
