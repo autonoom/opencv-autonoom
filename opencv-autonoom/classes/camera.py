@@ -84,7 +84,7 @@ def draw_lines(img, lines):
     i = 0
 
     # print lines
-    centerpic = 300
+    # centerpic = 300
     try:
         while not (i is len(lines)):
             # eerste lijn en die moet onder de 300 pixels met de x1 en x2
@@ -105,11 +105,12 @@ def draw_lines(img, lines):
             if calculate_degree(lines[i][0]) > 270:
                 if lijn2 is None:
                     lijn2 = lines[i][0]
+
                 else:
                     lijn2 = (lijn2 + lines[i][0]) / 2
 
-                    # print "dit is lijn2"
-                    # print lijn2
+                    #print "dit is lijn2"
+                    #print lijn2
             i += 1
 
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
@@ -150,7 +151,7 @@ def calculate_degree(point):  # http://wikicode.wikidot.com/get-angle-of-line-be
     angle = math.degrees(math.atan2(y_diff, x_diff))
     angle = angle * -1
     angle = round(angle % 360)
-    # print angle
+    print angle
     return angle
 
 
@@ -180,6 +181,8 @@ def calculate_avg(diference):
             data2 = float(data2)
             data2 = data2 / avg2
             data2 = data2 / 10
+            data2 *= 0.5
+            data2 = (4.2 * data2) + 13.4
             print "Avg data = " + str(data2)
             s.send(str(data2))
             data = 0
@@ -221,7 +224,7 @@ def process_img(original_image):
     #                       edges
     #                                                                   linelenght
     #                                                                         \/  gaps
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi / 180, 180, np.array([]), 10, 100)
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi / 180, 180, np.array([]), 10, 50)
     draw_lines(original_image, lines)
 
     # cv2.imshow('sjaak', original_image)         # stuurt de foto en de coordinaten van de lijnen op
