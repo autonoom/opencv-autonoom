@@ -172,14 +172,15 @@ def calculate_avg(diference):
         data += float(diference)
     elif counter is avg1:
         # avg from avg
-        data = data / 50
+        data = data / avg1
         if counter2 < avg2:
             counter2 += 1
             data2 += data
         elif counter2 is avg2:
             data2 = float(data2)
+            data2 = data2 / avg2
+            data2 = data2 / 10
             print "Avg data = " + str(data2)
-            data2 *= 3
             s.send(str(data2))
             data = 0
             counter = 0
