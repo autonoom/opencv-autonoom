@@ -1,17 +1,18 @@
-import numpy as np
-import cv2
 import math
-import urllib
 import socket
+import urllib
+import cv2
+import numpy as np
 
 detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
 
 TCP_IP = '192.168.42.1'
 TCP_PORT = 5005
 BUFFER_SIZE = 1024
-
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
+
+s.send('start')
 
 # def detect_trafficlight(image):
 #
@@ -81,63 +82,50 @@ def draw_lines(img, lines):
     lijn1 = None
     lijn2 = None
     i = 0
+
     # print lines
     centerpic = 300
     try:
-        while not(i is len(lines)):
+        while not (i is len(lines)):
             # eerste lijn en die moet onder de 300 pixels met de x1 en x2
             # eerste lijn niet twee keer vullen
 
             # print lines[i][0]
-            if lines[i][0][0] < centerpic + 150 and lines[i][0][2] < centerpic:
+            if calculate_degree(lines[i][0]) < 90:
                 if lijn1 is None:
                     lijn1 = lines[i][0]
+
                 else:
                     lijn1 = (lijn1 + lines[i][0]) / 2
 
-                # print "dit is lijn1"
-                # print lijn1
+                    # print "dit is lijn1"
+                    # print lijn1
             # tweede lijn moet boven de 300 pixels met beide x1 en x2
             # tweede lijn niet opnieuw vullen
-            if lines[i][0][0] >= centerpic - 150 and lines[i][0][2] >= centerpic:
+            if calculate_degree(lines[i][0]) > 270:
                 if lijn2 is None:
                     lijn2 = lines[i][0]
                 else:
                     lijn2 = (lijn2 + lines[i][0]) / 2
 
-                # print "dit is lijn2"
-                # print lijn2
+                    # print "dit is lijn2"
+                    # print lijn2
             i += 1
+
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
-        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 2)  # teken lijn 2
-            # bereken gemiddelde van per lijn lijn
+        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
+        # bereken gemiddelde van per lijn lijn
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
         # cv2.line(img,(xtop, 0), (xbot, 400),[255, 140, 0], 3)
         # cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
-        gem = (xtop + xbot) / 2         # berekent gemiddelde van de 2 lijnen
+        gem = (xtop + xbot) / 2  # berekent gemiddelde van de 2 lijnen
         # print gem
         draw_middle(img, gem)
         cv2.line(img, (gem, 0), (gem, 400), [255, 140, 0], 3)
 
     except Exception:
         pass
-
-# def draw_circles(img):
-#     circles = cv2.HoughCircles(img, cv2.HOUGH_GRADIENT, 1, 20, param1=50, param2=30, minRadius=0, maxRadius=0)
-#     circles = np.uint16(np.around(circles))
-#
-#     for i in circles[0, :]:
-#         if i[2] < 200:
-#             rad = (i[2] + rad) / 2
-#             x = (i[0] + x) / 2
-#             y = (i[1] + y) / 2
-#
-#             # draw the outer circle
-#             cv2.circle(img, (y, x), rad, (0, 255, 0), 2)
-#             # draw the center of the circle
-#             cv2.circle(img, (i[0], i[1]), 2, (0, 0, 255), 3)
-#             # print i
 
 
 def draw_middle(image, gem):
@@ -146,34 +134,30 @@ def draw_middle(image, gem):
     # print x
     # print y
 
-    # hier wordt her verschil van het gemiddelde en het midden van de camera opgestuurd via telnet
-    # TCP_IP = '192.168.42.1'
-    # TCP_PORT = 5005
-    # BUFFER_SIZE = 1024
-    # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    # s.connect((TCP_IP, TCP_PORT))
-
     # s.send(str(dif))
     if calculate_avg(dif):
         print 'stuur avg'
     else:
         pass
-    #print dif
-    cv2.line(image, ((x / 2), y), ((x/2), y-50), [85, 26, 139], 1)
+    # print dif
+    cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
 
 
 # dit is code om de hoek te bepalen van de lijnen dit gebruiken wij niet
-def calculate_degree(point):                     # http://wikicode.wikidot.com/get-angle-of-line-between-two-points
+def calculate_degree(point):  # http://wikicode.wikidot.com/get-angle-of-line-between-two-points
     x_diff = point[2] - point[0]
     y_diff = point[3] - point[1]
     angle = math.degrees(math.atan2(y_diff, x_diff))
     angle = angle * -1
-    print round(angle % 360)
+    angle = round(angle % 360)
+    # print angle
+    return angle
+
 
 counter = 0
-counter2= 0
+counter2 = 0
 data = 0
-data2 =0
+data2 = 0
 
 
 def calculate_avg(diference):
@@ -181,22 +165,21 @@ def calculate_avg(diference):
     global counter2
     global data, data2
 
-
-    avg1 = 5
+    avg1 = 2
     avg2 = 5
     if counter < avg1:
         counter += 1
         data += float(diference)
     elif counter is avg1:
         # avg from avg
-        data = data / 100
+        data = data / 50
         if counter2 < avg2:
             counter2 += 1
             data2 += data
         elif counter2 is avg2:
-            data2 = float(data2) / 5
+            data2 = float(data2)
             print "Avg data = " + str(data2)
-            data2 *= 2.5
+            data2 *= 3
             s.send(str(data2))
             data = 0
             counter = 0
@@ -206,6 +189,8 @@ def calculate_avg(diference):
     else:
         print 'dd'
     return False
+
+
 # def bird_eye(image):
 #     # y, x, ch = image.shape
 #     # print x
@@ -218,6 +203,7 @@ def calculate_avg(diference):
 
 # maakt region of interest aan
 
+
 def roi(img, vertices):
     mask = np.zeros_like(img)
     cv2.fillPoly(mask, vertices, 255)
@@ -229,12 +215,12 @@ def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_img = cv2.Canny(processed_img, threshold1=200, threshold2=300)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
-    vertices = np.array([[0, 400], [50, 200], [150, 150], [500, 150], [800, 400], [800, 400]], np.int32)
+    vertices = np.array([[0, 400], [50, 200], [150, 200], [500, 200], [800, 200], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
-    #linelenght
-    #gaps
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 100)
+    #                                                                   linelenght
+    #                                                                         \/  gaps
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi / 180, 180, np.array([]), 10, 100)
     draw_lines(original_image, lines)
 
     # cv2.imshow('sjaak', original_image)         # stuurt de foto en de coordinaten van de lijnen op
@@ -243,7 +229,7 @@ def process_img(original_image):
 
 def main():
     # https://github.com/miguelgrinberg/flask-video-streaming
-    stream = urllib.urlopen('http://192.168.42.1:5000/video_feed')                           # haalt video stream op
+    stream = urllib.urlopen('http://192.168.42.1:5000/video_feed')  # haalt video stream op
     bytes = ''
     while True:
         bytes += stream.read(1024)
@@ -253,13 +239,15 @@ def main():
             jpg = bytes[a:b + 2]
             bytes = bytes[b + 2:]
             frame = cv2.imdecode(np.fromstring(jpg, dtype=np.uint8), cv2.IMREAD_COLOR)
-            #new2_screen = detect_trafficlight(frame)
-            new_screen = process_img(frame)                                   # stuurt frame op naar process_img
-            cv2.imshow('window', new_screen)                                        # laat video zien
-            #cv2.imshow('window2', new2_screen)
+            # new2_screen = detect_trafficlight(frame)
+            new_screen = process_img(frame)  # stuurt frame op naar process_img
+            cv2.imshow('window', new_screen)  # laat video zien
+            # cv2.imshow('window2', new2_screen)
             # cv2.imshow('wiqndow2', cap)
             cv2.imshow('window3', frame)
-            if cv2.waitKey(25) & 0xFF == ord('q'):                         # wanneer 'q' is ingedrukt stop programma
+            if cv2.waitKey(25) & 0xFF == ord('q'):  # wanneer 'q' is ingedrukt stop programma
                 cv2.destroyAllWindows()
                 break
+
+
 main()
