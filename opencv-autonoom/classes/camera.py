@@ -89,7 +89,7 @@ def draw_lines(img, lines):
             # eerste lijn niet twee keer vullen
 
             # print lines[i][0]
-            if lines[i][0][0] < centerpic and lines[i][0][2] < centerpic:
+            if lines[i][0][0] < centerpic + 150 and lines[i][0][2] < centerpic:
                 if lijn1 is None:
                     lijn1 = lines[i][0]
                 else:
@@ -99,7 +99,7 @@ def draw_lines(img, lines):
                 # print lijn1
             # tweede lijn moet boven de 300 pixels met beide x1 en x2
             # tweede lijn niet opnieuw vullen
-            if lines[i][0][0] >= centerpic and lines[i][0][2] >= centerpic:
+            if lines[i][0][0] >= centerpic - 150 and lines[i][0][2] >= centerpic:
                 if lijn2 is None:
                     lijn2 = lines[i][0]
                 else:
@@ -152,6 +152,8 @@ def draw_middle(image, gem):
     # BUFFER_SIZE = 1024
     # s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     # s.connect((TCP_IP, TCP_PORT))
+
+    # s.send(str(dif))
     if calculate_avg(dif):
         print 'stuur avg'
     else:
@@ -178,7 +180,9 @@ def calculate_avg(diference):
     global counter
     global counter2
     global data, data2
-    avg1 = 10
+
+
+    avg1 = 5
     avg2 = 5
     if counter < avg1:
         counter += 1
@@ -192,8 +196,8 @@ def calculate_avg(diference):
         elif counter2 is avg2:
             data2 = float(data2) / 5
             print "Avg data = " + str(data2)
-            data2 *= 2
-            #s.send(str(data2))
+            data2 *= 2.5
+            s.send(str(data2))
             data = 0
             counter = 0
             data2 = 0
@@ -230,7 +234,7 @@ def process_img(original_image):
     #                       edges
     #linelenght
     #gaps
-    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 50)
+    lines = cv2.HoughLinesP(processed_img, 1, np.pi/180, 180, np.array([]), 10, 100)
     draw_lines(original_image, lines)
 
     # cv2.imshow('sjaak', original_image)         # stuurt de foto en de coordinaten van de lijnen op
