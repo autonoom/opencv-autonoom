@@ -127,7 +127,7 @@ def draw_lines(img, lines):
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
             check = 360-check
-            print check 
+            print check
             if check > 40:
                 steeringvalue = (-(check*0.050))+13.4
 
