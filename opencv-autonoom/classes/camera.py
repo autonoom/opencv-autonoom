@@ -116,7 +116,7 @@ def draw_lines(img, lines):
             cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
             check = calculate_degree(lijn1)
             check -= 300
-            steeringvalue = (check*0.05)+13.4
+            steeringvalue = (check*0.0675)+13.4
             print check
             print steeringvalue
 
@@ -124,7 +124,7 @@ def draw_lines(img, lines):
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
             check -= 300
-            steeringvalue = (-(check*0.065))+13.4
+            steeringvalue = (-(check*0.0675))+13.4
             print check
             print steeringvalue
             s.send(str(steeringvalue))
@@ -147,6 +147,11 @@ def draw_middle(image, gem):
     y, x, z = image.shape
     dif = gem - (x / 2)
     # print dif
+    if calculate_avg(dif):
+        pass
+    else:
+        pass
+
     cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
 
 
