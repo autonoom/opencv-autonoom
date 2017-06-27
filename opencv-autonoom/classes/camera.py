@@ -110,21 +110,21 @@ def draw_lines(img, lines):
                     #print "dit is lijn2"
                     #print lijn2
             i += 1
-        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)
-        cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)
-        # if lijn1 is not None and lijn2 is None:
-        #     cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
-        #     check = calculate_degree(lijn1)
-        #     check = 360 - check
-        #     check /= 3
-        #     print 'klaas1'
-        #     print check
-        #     s.send(str(check))
+        # cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)
+        # cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)
+        if lijn1 is not None and lijn2 is None:
+            cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
+            check = calculate_degree(lijn1)
+            check -= 300
+            steeringvalue = (check*0.05)+13.4
+            print check
+            print steeringvalue
+
         if lijn2 is not None and lijn1 is None:
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
             check -= 300
-            steeringvalue = (check*0.05)+13,4
+            steeringvalue = (-(check*0.065))+13.4
             print check
             print steeringvalue
             s.send(str(steeringvalue))
@@ -223,7 +223,7 @@ def roi(img, vertices):
 
 def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-    processed_img = cv2.Canny(processed_img, threshold1=200, threshold2=300)
+    processed_img = cv2.Canny(processed_img, threshold1=50, threshold2=250)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
     vertices = np.array([[0, 400], [50, 250], [150, 250], [500, 250], [800, 250], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
