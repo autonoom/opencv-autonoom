@@ -112,9 +112,25 @@ def draw_lines(img, lines):
                     #print "dit is lijn2"
                     #print lijn2
             i += 1
+        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)
+        cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)
+        if lijn1 is not None and lijn2 is None:
+            cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
+            check = calculate_degree(lijn2)
+            check = 360 - check
+            check /= 3
+            print 'klaas1'
+            print check
+            s.send(str(check))
 
-        cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
-        cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
+        if lijn2 is not None and lijn1 is None:
+            cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
+            check = calculate_degree(lijn2)
+            check /= 3
+            print 'sjaak'
+            print check
+            s.send(str(check))
+
         # bereken gemiddelde van per lijn lijn
         xtop = (lijn2[0] + lijn1[2]) / 2
         xbot = (lijn2[2] + lijn1[0]) / 2
@@ -151,7 +167,7 @@ def calculate_degree(point):  # http://wikicode.wikidot.com/get-angle-of-line-be
     angle = math.degrees(math.atan2(y_diff, x_diff))
     angle = angle * -1
     angle = round(angle % 360)
-    print angle
+    # print angle
     return angle
 
 
@@ -219,7 +235,7 @@ def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_img = cv2.Canny(processed_img, threshold1=200, threshold2=300)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
-    vertices = np.array([[0, 400], [50, 200], [150, 200], [500, 200], [800, 200], [800, 400]], np.int32)
+    vertices = np.array([[0, 400], [50, 250], [150, 250], [500, 250], [800, 250], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
     #                                                                   linelenght
