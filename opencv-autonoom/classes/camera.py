@@ -94,7 +94,6 @@ def draw_lines(img, lines):
             if calculate_degree(lines[i][0]) < 90:
                 if lijn1 is None:
                     lijn1 = lines[i][0]
-
                 else:
                     lijn1 = (lijn1 + lines[i][0]) / 2
 
@@ -105,7 +104,6 @@ def draw_lines(img, lines):
             if calculate_degree(lines[i][0]) > 270:
                 if lijn2 is None:
                     lijn2 = lines[i][0]
-
                 else:
                     lijn2 = (lijn2 + lines[i][0]) / 2
 
@@ -114,15 +112,14 @@ def draw_lines(img, lines):
             i += 1
         cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)
         cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)
-        if lijn1 is not None and lijn2 is None:
-            cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
-            check = calculate_degree(lijn2)
-            check = 360 - check
-            check /= 3
-            print 'klaas1'
-            print check
-            s.send(str(check))
-
+        # if lijn1 is not None and lijn2 is None:
+        #     cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
+        #     check = calculate_degree(lijn1)
+        #     check = 360 - check
+        #     check /= 3
+        #     print 'klaas1'
+        #     print check
+        #     s.send(str(check))
         if lijn2 is not None and lijn1 is None:
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
@@ -148,14 +145,6 @@ def draw_lines(img, lines):
 def draw_middle(image, gem):
     y, x, z = image.shape
     dif = gem - (x / 2)
-    # print x
-    # print y
-
-    # s.send(str(dif))
-    if calculate_avg(dif):
-        print 'stuur avg'
-    else:
-        pass
     # print dif
     cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
 
