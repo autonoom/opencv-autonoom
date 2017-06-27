@@ -230,7 +230,7 @@ def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
     processed_img = cv2.Canny(processed_img, threshold1=50, threshold2=250)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
-    vertices = np.array([[0, 400], [50, 250], [150, 250], [500, 250], [800, 250], [800, 400]], np.int32)
+    vertices = np.array([[0, 400], [50, 300], [150, 300], [500, 300], [800, 300], [800, 400]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
     #                                                                   linelenght
