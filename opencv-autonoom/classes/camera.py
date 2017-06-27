@@ -123,10 +123,11 @@ def draw_lines(img, lines):
         if lijn2 is not None and lijn1 is None:
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
-            check /= 3
-            print 'sjaak'
+            check -= 300
+            steeringvalue = (check*0.05)+13,4
             print check
-            s.send(str(check))
+            print steeringvalue
+            s.send(str(steeringvalue))
 
         # bereken gemiddelde van per lijn lijn
         xtop = (lijn2[0] + lijn1[2]) / 2
