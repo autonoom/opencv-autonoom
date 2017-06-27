@@ -115,19 +115,27 @@ def draw_lines(img, lines):
         if lijn1 is not None and lijn2 is None:
             cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
             check = calculate_degree(lijn1)
-            check -= 300
-            steeringvalue = (check*0.0675)+13.4
-            print check
-            print steeringvalue
+            check = 360-check
+            if check > 28:
+                pass
+            else:
+                steeringvalue = (check*0.0675)+13.4
+                print check
+                print steeringvalue
 
         if lijn2 is not None and lijn1 is None:
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
-            check -= 300
-            steeringvalue = (-(check*0.0675))+13.4
-            print check
-            print steeringvalue
-            s.send(str(steeringvalue))
+            check = 360-check
+            print check 
+            if check > 40:
+                steeringvalue = (-(check*0.050))+13.4
+
+                print steeringvalue
+                s.send(str(steeringvalue))
+            else:
+                pass
+
 
         # bereken gemiddelde van per lijn lijn
         xtop = (lijn2[0] + lijn1[2]) / 2
@@ -228,9 +236,9 @@ def roi(img, vertices):
 
 def process_img(original_image):
     processed_img = cv2.cvtColor(original_image, cv2.COLOR_BGR2GRAY)
-    processed_img = cv2.Canny(processed_img, threshold1=50, threshold2=250)
+    processed_img = cv2.Canny(processed_img, threshold1=100, threshold2=275)
     processed_img = cv2.GaussianBlur(processed_img, (3, 3), 0)
-    vertices = np.array([[0, 400], [50, 300], [150, 300], [500, 300], [800, 300], [800, 400]], np.int32)
+    vertices = np.array([[0, 450], [50, 275], [150, 300], [500, 300], [800, 300], [800, 450]], np.int32)
     processed_img = roi(processed_img, [vertices])
     #                       edges
     #                                                                   linelenght
