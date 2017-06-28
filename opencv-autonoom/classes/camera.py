@@ -3,7 +3,7 @@ import socket
 import urllib
 import cv2
 import numpy as np
-
+import time
 detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
 
 TCP_IP = '192.168.42.1'
@@ -110,31 +110,39 @@ def draw_lines(img, lines):
                     #print "dit is lijn2"
                     #print lijn2
             i += 1
+        print 'lijn 1', lijn1
+        print 'lijn 2', lijn2
+        time.sleep(5)
         # cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)
         # cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)
-        if lijn1 is not None and lijn2 is None:
-            cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
-            check = calculate_degree(lijn1)
-            check = 360-check
-            if check > 28:
-                pass
-            else:
-                steeringvalue = (check*0.0675)+13.4
-                print check
-                print steeringvalue
 
-        if lijn2 is not None and lijn1 is None:
-            cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
-            check = calculate_degree(lijn2)
-            check = 360-check
-            print check
-            if check > 40:
-                steeringvalue = (-(check*0.050))+13.4
-
-                print steeringvalue
-                s.send(str(steeringvalue))
-            else:
-                pass
+        # ##turn to the left
+        # if lijn1 is not None and lijn2 is None:
+        #     cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
+        #     check = calculate_degree(lijn1)
+        #     check = 360-check
+        #     print 'paas'
+        #     if check > 28:
+        #         pass
+        #     else:
+        #         steeringvalue = (check*0.0675)+13.4
+        #         print 'check', check
+        #         print 'steeringvalue', steeringvalue
+        #
+        # ## turn to the right
+        # if lijn2 is not None and lijn1 is None:
+        #     cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 0, 255], 2)  # Teken lijn 2
+        #     check = calculate_degree(lijn2)
+        #     check = 360-check
+        #     print check
+        #     print 'dadf'
+        #     if check > 40:
+        #         steeringvalue = (-(check*0.050))+13.4
+        #
+        #         print steeringvalue
+        #         s.send(str(steeringvalue))
+        #     else:
+        #         pass
 
 
         # bereken gemiddelde van per lijn lijn
@@ -144,23 +152,23 @@ def draw_lines(img, lines):
         # cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
         gem = (xtop + xbot) / 2  # berekent gemiddelde van de 2 lijnen
         # print gem
-        draw_middle(img, gem)
+        #draw_middle(img, gem)
         cv2.line(img, (gem, 0), (gem, 400), [255, 140, 0], 3)
 
     except Exception:
         pass
 
 
-def draw_middle(image, gem):
-    y, x, z = image.shape
-    dif = gem - (x / 2)
-    # print dif
-    if calculate_avg(dif):
-        pass
-    else:
-        pass
-
-    cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
+# def draw_middle(image, gem):
+#     y, x, z = image.shape
+#     dif = gem - (x / 2)
+#     # print dif
+#     if calculate_avg(dif):
+#         pass
+#     else:
+#         pass
+#
+#     cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
 
 
 # dit is code om de hoek te bepalen van de lijnen dit gebruiken wij niet
@@ -174,45 +182,43 @@ def calculate_degree(point):  # http://wikicode.wikidot.com/get-angle-of-line-be
     return angle
 
 
-counter = 0
-counter2 = 0
-data = 0
-data2 = 0
-
-
-def calculate_avg(diference):
-    global counter
-    global counter2
-    global data, data2
-
-    avg1 = 2
-    avg2 = 5
-    if counter < avg1:
-        counter += 1
-        data += float(diference)
-    elif counter is avg1:
-        # avg from avg
-        data = data / avg1
-        if counter2 < avg2:
-            counter2 += 1
-            data2 += data
-        elif counter2 is avg2:
-            data2 = float(data2)
-            data2 = data2 / avg2
-            data2 = data2 / 10
-            data2 *= 0.5
-            data2 = (4.2 * data2) + 13.4
-            print "Avg data = " + str(data2)
-            s.send(str(data2))
-            data = 0
-            counter = 0
-            data2 = 0
-            counter2 = 0
-            return True
-    else:
-        print 'dd'
-    return False
-
+# counter = 0
+# counter2 = 0
+# data = 0
+# data2 = 0
+# def calculate_avg(diference):
+#     global counter
+#     global counter2
+#     global data, data2
+#
+#     avg1 = 2
+#     avg2 = 5
+#     if counter < avg1:
+#         counter += 1
+#         data += float(diference)
+#     elif counter is avg1:
+#         # avg from avg
+#         data = data / avg1
+#         if counter2 < avg2:
+#             counter2 += 1
+#             data2 += data
+#         elif counter2 is avg2:
+#             data2 = float(data2)
+#             data2 = data2 / avg2
+#             data2 = data2 / (avg1*avg2)
+#             #data2 *= 0.5
+#             #data2 = (4.2 * data2) + 13.4
+#             print "Avg data = " + str(data2)
+#             s.send(str(data2))
+#             data = 0
+#             counter = 0
+#             data2 = 0
+#             counter2 = 0
+#             return True
+#     else:
+#         print 'dd'
+#     return False
+#
 
 # def bird_eye(image):
 #     # y, x, ch = image.shape
