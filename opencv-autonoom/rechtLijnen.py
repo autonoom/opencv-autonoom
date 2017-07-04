@@ -10,8 +10,11 @@ BUFFER_SIZE = 1024
 s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s.connect((TCP_IP, TCP_PORT))
 
-def detect_trafficlight(image):
+detectMultiScale = cv2.CascadeClassifier('traffic_light.xml')
 
+#This function detects a traffic light it has been copied from the following link
+#https://github.com/hamuchiwa/AutoRCCar/blob/master/computer/rc_driver.py
+def detect_trafficlight(image):
     red_light = False
     green_light = False
     yellow_light = False
@@ -59,6 +62,7 @@ def detect_trafficlight(image):
                 green_light = True
                 s.send('start')
                 print "green"
+                return True
 
             #yellow light
             elif 4.0/8*(height-30) < maxLoc[1] < 5.5/8*(height-30):
@@ -67,7 +71,7 @@ def detect_trafficlight(image):
 
                 # s.send('stop')
                 print "orange"
-    return image
+    return False
 
 
 def send():
@@ -81,7 +85,7 @@ def calculate_degree(point):  # http://wikicode.wikidot.com/get-angle-of-line-be
     angle = round(angle % 360)
     return angle
 
-def draw_lines(img, lines):
+def calc_lines(img, lines):
     lijn1 = None
     lijn2 = None
     i = 0
@@ -102,12 +106,8 @@ def draw_lines(img, lines):
                     lijn2 = lines[i][0]
                 else:
                     lijn2 = (lijn2 + lines[i][0]) / 2
-
-                    #print "dit is lijn2"
-                    #print lijn2
             i += 1
-        #print 'lijn 1', lijn1
-        #print 'lijn 2', lijn2
+
         #make here a try for the avg
         #Otherwise he won't go further
         try:
@@ -118,13 +118,15 @@ def draw_lines(img, lines):
         # ##turn to the right
         if lijn1 is not None and lijn2 is None:
             cv2.line(img, (lijn1[0], lijn1[1]), (lijn1[2], lijn1[3]), [0, 255, 0], 2)  # Teken lijn 1
+            # calculate degree
             check = calculate_degree(lijn1)
-            check = 360-check
-            print 'paas'
-            print 'check', check
+            # if calculate below 40 skip it
+            # because he made's the turn to fast otherwise
+
             if check < 40:
                 pass
             else:
+                # this value is adapt to max or min value of the servo
                 steeringvalue = (check*0.050)
                 print 'check', check
                 print 'steeringvalue', steeringvalue
@@ -132,11 +134,14 @@ def draw_lines(img, lines):
         elif lijn2 is not None and lijn1 is None:
             cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [255, 255, 255], 2)  # Teken lijn 2
             check = calculate_degree(lijn2)
+            # 360 minus the degree because of the left turn
             check = 360-check
-            print check
+            # if calculate below 44 skip it
+            # because he made's the turn to fast otherwise
             if check < 44:
-                steeringvalue = (-(check*0.075)) #tussen de 0.055 en 0.066
-                print 'steeringvalue', steeringvalue
+                # this value is adapt to max or min value of the servo
+                steeringvalue = (-(check*0.075))
+                #send the value
                 s.send(str(steeringvalue))
             else:
                 pass
@@ -150,29 +155,31 @@ def draw_lines(img, lines):
             # cv2.line(img, (lijn2[0], lijn2[1]), (lijn2[2], lijn2[3]), [0, 255, 0], 3)
             gem = (xtop + xbot) / 2  # berekent gemiddelde van de 2 lijnen
 
-            draw_middle(img, gem)
+            middle(img, gem)
             #cv2.line(img, (gem, 0), (gem, 400), [255, 140, 0], 3)
 
     except Exception:
         pass
 
-def draw_middle(image, gem):
 
+def middle(image, gem):
     y, x = image.shape
     dif = gem - (x / 2)
-
+    # calculate the avg of the two lines he find
     if calculate_avg(dif):
         pass
     else:
         pass
     cv2.line(image, ((x / 2), y), ((x / 2), y - 50), [85, 26, 139], 1)
 
-
+# these variables are for the calculation of the avg function
 counter = 0
 counter2 = 0
 data = 0
 data2 = 0
 
+#This function takes the avg of multiple lines
+#For the simple reason that the servo didn't went to fast to left and right.
 def calculate_avg(diference):
     global counter
     global counter2
@@ -193,6 +200,7 @@ def calculate_avg(diference):
             data2 = float(data2)
             data2 = data2 / avg2
             data2 = data2 / (avg1*avg2)
+            #the 0.9 is to transform a correct data for the servo
             data2 *= 0.9
             print "Avg data = " + str(data2)
             s.send(str(data2))
@@ -210,10 +218,12 @@ def find_lines(original_image):
     #                                                                   linelenght
     #                                                                         \/  gaps
     lines = cv2.HoughLinesP(original_image, 1, np.pi / 180, 180, np.array([]), 20, 50)
-    draw_lines(original_image, lines)
+    # this function takes the image and search for lines and turns
+    calc_lines(original_image, lines)
     return original_image
 
 def roi(img):
+    # take the width and the height
     height, width = img.shape
     ########################################
     # (0.0)                        (300.300)#
@@ -223,25 +233,27 @@ def roi(img):
     #                                      #
     # (0.300)                      (300.300)#
     ########################################
-    #        [y1:y2, x1, x2]
+    #        [y1:y2, x1, x2] <-- this is the region of interest
     img = img[height - 250:height, width - width:width]
-    #print height, width
-    #cv2.imshow('image', img)
     return img
 
 def image_retrieved_and_edited(img):
-    #img = cv2.imread('recht.PNG', cv2.IMREAD_COLOR)
+    #convert color (BRG) img to gray
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #the Canny function with threshold
     img = cv2.Canny(img, threshold1=180, threshold2=280)
+    #the GaussianBlur blurred the image
     img = cv2.GaussianBlur(img, (3, 3), 0)
+    #The region of interest is used to minimize the interest of the image
     img = roi(img)
     return img
 
 def main():
     # https://github.com/miguelgrinberg/flask-video-streaming
+    Traffic = False
     stream = urllib.urlopen('http://192.168.42.1:5000/video_feed')  # haalt video stream op
     bytes = ''
-    send()
+
     while True:
         bytes += stream.read(1024)
         a = bytes.find('\xff\xd8')
@@ -255,12 +267,15 @@ def main():
             img_edit = image_retrieved_and_edited(frame)
             #find the lines
             new_screen = find_lines(img_edit)
-            trafficlight = detect_trafficlight(frame)
-            # show the lines and average
+            if not Traffic:
+                trafficlight = detect_trafficlight(frame)
+                if trafficlight == True:
+                    Traffic = True
+            else:
+                pass
+            #show the lines and average
             cv2.imshow('traffic light', trafficlight)
             cv2.imshow('lijnen', new_screen)
             if cv2.waitKey(25) & 0xFF == ord('q'):  # when 'q' is pressed the program will stop
-                s.send('stop')
                 cv2.destroyAllWindows()
-                break
-main()               
+main()      
